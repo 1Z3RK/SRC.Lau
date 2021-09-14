@@ -1,0 +1,79 @@
+local client = game:GetService('Players').LocalPlayer
+
+local snew = function(faces, obj, role)
+	local lol = {}
+	for huh, face in next, faces do
+		local gui = Instance.new('SurfaceGui', obj)
+		gui.Name = 'LOLLED'
+		gui.Enabled = true
+		gui.AlwaysOnTop = true
+		gui.Face = face
+		table.insert(lol, gui)
+	end
+	if role == 'assassin' then
+		for _, what in pairs(lol) do
+			local gui = Instance.new('Frame', what)
+			gui.Size = UDim2.new(1, 0, 1, 0)
+			gui.BorderSizePixel = 0
+			gui.BackgroundTransparency = 0.5
+			gui.BackgroundColor = BrickColor.new('Really red')
+		end
+	elseif role == 'target' then
+		for _, what in pairs(lol) do
+			local gui = Instance.new('Frame', what)
+			gui.Size = UDim2.new(1, 0, 1, 0)
+			gui.BorderSizePixel = 0
+			gui.BackgroundTransparency = 0.5
+			gui.BackgroundColor = BrickColor.new('Lime green')
+		end
+	end
+end
+
+game:GetService('RunService').Stepped:Connect(function()
+	for _, v in pairs(game.Players:GetChildren()) do
+		if v.role.Value == 'assassin' then
+			for _, obj in pairs(v.Character:GetChildren()) do
+				if obj:IsA('BasePart') and not obj:FindFirstChildOfClass('SurfaceGui') then
+					snew({'Front', 'Back', 'Left', 'Right', 'Top', 'Bottom'}, obj, v.role.Value)
+				end
+			end
+		elseif v.role.Value == 'target' then
+			for _, obj in pairs(v.Character:GetChildren()) do
+				if obj:IsA('BasePart') and not obj:FindFirstChildOfClass('SurfaceGui') then
+					snew({'Front', 'Back', 'Left', 'Right', 'Top', 'Bottom'}, obj, v.role.Value)
+				end
+			end
+		else
+			for _, obj in pairs(v.Character:GetChildren()) do
+				if obj:FindFirstChild('LOLLED') then
+					obj:Remove()
+				end
+			end
+		end
+	end
+end)
+
+client.Chatted:Connect(function(chat) 
+	if string.lower(chat:sub(1, 8)) == '/e clips' then
+		local modnumber = tonumber(chat:sub(10))
+		for i, v in pairs(workspace[client.Name]:GetChildren()) do
+			if v:FindFirstChild('GunHandler') then
+				v.GunHandler.bstorage:FireServer(modnumber)
+			end
+		end
+	elseif string.lower(chat) == '/e assassin' then
+		for _, v in pairs(game.Players:GetChildren()) do
+			if v.Name ~= game.Players.LocalPlayer.Name and v.role.Value == "assassin" then
+				v.Character.Head.Anchored = true
+				v.Character.Head.CFrame = game.Players.LocalPlayer.Character.Head.CFrame*CFrame.new(0,0,-5)
+			end
+		end
+	elseif string.lower(chat) == '/e target' then
+		for _, v in pairs(game.Players:GetChildren()) do
+			if v.Name ~= game.Players.LocalPlayer.Name and v.role.Value == "target" then
+				v.Character.Head.Anchored = true
+				v.Character.Head.CFrame = game.Players.LocalPlayer.Character.Head.CFrame*CFrame.new(0,0,-5)
+			end
+		end		
+	end
+end)
